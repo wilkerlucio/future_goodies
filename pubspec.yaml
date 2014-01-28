@@ -1,0 +1,7 @@
+name: future_goodies
+author: Wilker Lúcio <wilkerlucio@gmail.com>
+version: 0.0.1
+description: Future helper libraries for async management.
+dev_dependencies:
+  barrier:
+    path: /Users/wilkerlucio/Development/dart/barrier
