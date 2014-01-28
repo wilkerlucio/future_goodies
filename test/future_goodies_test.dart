@@ -46,6 +46,16 @@ void runTests() {
         });
       });
     });
+
+    describe("pipeline", () {
+      it("resolves to null when input is blank", () {
+        return pipeline([], (acc, value) {}).then((res) => expect(res) == null);
+      });
+
+      it("resolves to the returned value", () {
+        return pipeline([1], (acc, value) => value).then((res) => expect(res) == 1);
+      });
+    });
   });
 }
 
