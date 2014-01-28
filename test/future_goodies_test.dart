@@ -49,11 +49,15 @@ void runTests() {
 
     describe("pipeline", () {
       it("resolves to null when input is blank", () {
-        return pipeline([], (acc, value) {}).then((res) => expect(res) == null);
+        return pipeline([], (acc, value) {}, null).then((res) => expect(res) == null);
       });
 
       it("resolves to the returned value", () {
-        return pipeline([1], (acc, value) => value).then((res) => expect(res) == 1);
+        return pipeline([1], (acc, value) => value, null).then((res) => expect(res) == 1);
+      });
+
+      it("accumulates the inputs", () {
+        return pipeline([1, 2], (acc, value) => acc + value, 0).then((res) => expect(res) == 3);
       });
     });
   });

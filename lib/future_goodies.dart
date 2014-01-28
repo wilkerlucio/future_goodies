@@ -14,7 +14,7 @@ Future sequence(Iterable iterable, FutureFunction iterator) {
   }, []);
 }
 
-Future pipeline(Iterable list, FutureReduceFunction iterator, [initial = null]) {
+Future pipeline(Iterable list, FutureReduceFunction iterator, dynamic initial) {
   if (list.isEmpty)
     return new Future.value(null);
 
