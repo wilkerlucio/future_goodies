@@ -2,8 +2,6 @@
 # See http://pub.dartlang.org/doc/glossary.html#lockfile
 packages:
   barrier:
-    description:
-      path: "/Users/wilkerlucio/Development/dart/barrier"
-      relative: false
-    source: path
+    description: barrier
+    source: hosted
     version: "0.0.1"

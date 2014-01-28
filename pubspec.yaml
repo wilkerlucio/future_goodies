@@ -4,5 +4,4 @@ version: 0.0.1
 homepage: https://github.com/wilkerlucio/future_goodies
 description: Future helper libraries for async management.
 dev_dependencies:
-  barrier:
-    path: /Users/wilkerlucio/Development/dart/barrier
+  barrier: any
