@@ -36,7 +36,7 @@ void main() {
   Future<List<int>> result = sequence([1, 2, 3, 4], (n) => delayed(n * 2));
   
   result.then((List<int> values) {
-    print(values); # [2, 4, 6, 8]
+    print(values); // [2, 4, 6, 8]
   });
 }
 ```
