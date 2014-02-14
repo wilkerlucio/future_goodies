@@ -9,12 +9,12 @@ Future sequence(Iterable iterable, FutureFunction iterator) {
   if (iterable.isEmpty)
     return new Future.value([]);
 
-  return pipeline(iterable, (list, value) {
+  return pipeline([], iterable, (list, value) {
     return iterator(value).then((result) => list..add(result));
-  }, []);
+  });
 }
 
-Future pipeline(Iterable list, FutureReduceFunction iterator, dynamic initial) {
+Future pipeline(dynamic initial, Iterable list, FutureReduceFunction iterator) {
   if (list.isEmpty)
     return new Future.value(null);
 
@@ -30,4 +30,8 @@ Future _pipeline(Iterator iterator, FutureReduceFunction async, dynamic accumula
                      });
   } else
     return new Future.value(accumulator);
+}
+
+Future silentError(Future future) {
+  return future.catchError((_) => null);
 }

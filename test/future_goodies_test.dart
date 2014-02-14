@@ -1,32 +1,32 @@
-import 'package:barrier/dsl.dart';
+import 'package:unittest/unittest.dart';
 import 'package:future_goodies/future_goodies.dart';
 import 'dart:async';
 
 final Function IDENTITY = (x) => x;
 
 void runTests() {
-  describe("Future Goodies", () {
-    describe("sequence", () {
+  group("Future Goodies", () {
+    group("sequence", () {
       Future testValidSequence(List input, List output, {Function mapFunction}) {
         if (mapFunction == null)
           mapFunction = IDENTITY;
 
-        return sequence(input, mapFunction).then((res) => expect(res).eql(output));
+        expect(sequence(input, mapFunction), completion(equals(output)));
       }
 
-      it("resolves into a blank list when a blank list is given", () {
-        return testValidSequence([], []);
+      test("resolves into a blank list when a blank list is given", () {
+        testValidSequence([], []);
       });
 
-      it("resolves a list with promises results", () {
-        return testValidSequence([1, 2], [3, 4], mapFunction: plusTwo);
+      test("resolves a list with promises results", () {
+        testValidSequence([1, 2], [3, 4], mapFunction: plusTwo);
       });
 
-      it("rejects when a promise rejects", () {
-        expect(sequence([1], throwError)).reject();
+      test("rejects when a promise rejects", () {
+        expect(sequence([1], throwError), throws);
       });
 
-      it("runs the tasks in sequence", () {
+      test("runs the tasks in sequence", () {
         List calls = [];
         Completer lastCompleter;
 
@@ -37,34 +37,47 @@ void runTests() {
           return lastCompleter.future;
         });
 
-        expect(calls).eql([1]);
+        expect(calls, equals([1]));
 
         lastCompleter.complete(calls.last);
 
         return lastCompleter.future.then((v) {
-          expect(calls).eql([1, 2]);
+          expect(calls, equals([1, 2]));
         });
       });
     });
 
-    describe("pipeline", () {
-      it("resolves to null when input is blank", () {
-        return pipeline([], (acc, value) {}, null).then((res) => expect(res) == null);
+    group("pipeline", () {
+      test("resolves to null when input is blank", () {
+        expect(pipeline(null, [], (acc, value) {}), completion(isNull));
       });
 
-      it("resolves to the returned value", () {
-        return pipeline([1], (acc, value) => value, null).then((res) => expect(res) == 1);
+      test("resolves to the returned value", () {
+        expect(pipeline(null, [1], (acc, value) => value), completion(equals(1)));
       });
 
-      it("accumulates the inputs", () {
-        return pipeline([1, 2], (acc, value) => acc + value, 0).then((res) => expect(res) == 3);
+      test("accumulates the inputs", () {
+        expect(pipeline(0, [1, 2], (acc, value) => acc + value), completion(equals(3)));
+      });
+    });
+
+    group('silentError', () {
+      test('resolves the original value when the future completes', () {
+        expect(silentError(new Future.value('x')), completion('x'));
+      });
+
+      test('resolves to null when the future throws an error', () {
+        Completer completer = new Completer();
+        completer.completeError(new Exception('err'));
+
+        expect(silentError(completer.future), completion(isNull));
       });
     });
   });
 }
 
-plusTwo(v) => new Future.value(v + 2);
+Future plusTwo(v) => new Future.value(v + 2);
 
-throwError(v) => throw new Exception("an error ocurred");
+Future throwError(v) => throw new Exception("an error ocurred");
 
-void main() => run(runTests);
+void main() => runTests();
