@@ -54,7 +54,7 @@ Future delayed(value) {
 }
 
 void main() {
-  Future<int> result = pipeline(0, [1, 2, 3, 4], (int acc, int n) => acc + n);
+  Future<int> result = pipeline(0, [1, 2, 3, 4], (int acc, int n) => delayed(acc + n));
   
   result.then((int sum) {
     print(sum); // 10
