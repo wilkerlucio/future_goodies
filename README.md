@@ -40,3 +40,26 @@ void main() {
   });
 }
 ```
+
+### pipeline
+
+This function works pretty much as `sequence`, but it needs an initial accumulator and it accumulates the results, for example:
+
+```dart
+import 'package:future_goodies/future_goodies.dart';
+import 'dart:async';
+
+Future delayed(value) {
+  return new Future.delayed(new Duration(milliseconds: 20), () => value);
+}
+
+void main() {
+  Future<int> result = pipeline(0, [1, 2, 3, 4], (int acc, int n) => acc + n);
+  
+  result.then((int sum) {
+    print(sum); // 10
+  });
+}
+```
+
+In the same fashion as `sequence`, if any iteration fail, the `Future` will fail too with the error.
