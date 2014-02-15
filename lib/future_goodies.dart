@@ -2,36 +2,30 @@ library future_goodies;
 
 import 'dart:async';
 
-typedef Future FutureFunction(dynamic item);
-typedef Future FutureReduceFunction(dynamic accumulator, dynamic value);
+typedef Future FutureFunction(item);
+typedef Future FutureReduceFunction(accumulator, value);
 
 Future sequence(Iterable iterable, FutureFunction iterator) {
-  if (iterable.isEmpty)
-    return new Future.value([]);
-
-  return pipeline([], iterable, (list, value) {
-    return iterator(value).then((result) => list..add(result));
-  });
+  return (iterable.isEmpty) 
+      ? new Future.value([])
+      : pipeline([], iterable, (list, value) =>
+          iterator(value).then((result) => list..add(result));
 }
 
-Future pipeline(dynamic initial, Iterable list, FutureReduceFunction iterator) {
-  if (list.isEmpty)
-    return new Future.value(null);
-
-  return _pipeline(list.iterator, iterator, initial);
+Future pipeline(initial, Iterable list, FutureReduceFunction iterator) {
+  return (list.isEmpty) 
+      ? new Future.value(null)
+      : _pipeline(list.iterator, iterator, initial);
 }
 
-Future _pipeline(Iterator iterator, FutureReduceFunction async, dynamic accumulator) {
+Future _pipeline(Iterator iterator, FutureReduceFunction async, accumulator) {
   if (iterator.moveNext()) {
-    Object current = iterator.current;
+    var current = iterator.current;
     return new Future.sync(() => async(accumulator, current))
-                     .then((value) {
-                       return _pipeline(iterator, async, value);
-                     });
-  } else
+                     .then((value) => _pipeline(iterator, async, value));
+  } else {
     return new Future.value(accumulator);
+  }
 }
 
-Future silentError(Future future) {
-  return future.catchError((_) => null);
-}
+Future silentError(Future future) => future.catchError((_) => null);
