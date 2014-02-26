@@ -29,12 +29,12 @@ import 'package:future_goodies/future_goodies.dart';
 import 'dart:async';
 
 Future delayed(value) {
-  return new Future.delayed(new Duration(milliseconds: 20), () => value);
+  return new Future.delayed(new Duration(milliseconds: 20), () => value));
 }
 
 void main() {
   Future<List<int>> result = sequence([1, 2, 3, 4], (n) => delayed(n * 2));
-  
+
   result.then((List<int> values) {
     print(values); // [2, 4, 6, 8]
   });
@@ -43,23 +43,75 @@ void main() {
 
 ### pipeline
 
-This function works pretty much as `sequence`, but it needs an initial accumulator and it accumulates the results, for example:
+Reduces a collection to a single value by iteratively combining each
+element of the collection with an existing value using the provided
+function. The iterator must return a Future, and the iterator
+will wait for it before moving on.
+
+If any iteration fails the result Future will fail with same error.
 
 ```dart
-import 'package:future_goodies/future_goodies.dart';
-import 'dart:async';
+Future simpleDelay(value) => new Future.delayed(new Duration(milliseconds: 10));
 
-Future delayed(value) {
-  return new Future.delayed(new Duration(milliseconds: 20), () => value);
-}
-
-void main() {
-  Future<int> result = pipeline(0, [1, 2, 3, 4], (int acc, int n) => delayed(acc + n));
-  
-  result.then((int sum) {
-    print(sum); // 10
-  });
-}
+pipeline('', ['a', 'b', 'c'], (String acc, String v) => simpleDelay(acc + v)).then((String result) {
+  print(result); // 'abc'
+});
 ```
 
-In the same fashion as `sequence`, if any iteration fail, the `Future` will fail too with the error.
+### FutureWorker
+
+Managers a Future worker poll
+
+The purpouse of this class is to help when you need to impose some limit
+for Future calls. You just need to initialize with the limit number of
+workers, then you call push passing a function that returns a Future
+and with that the worker will manage to call this function when the poll
+has space:
+
+```dart
+class SimpleJob {
+  bool started = false;
+  Completer completer = new Completer();
+
+  Future run() {
+    started = true;
+
+    return completer.future;
+  }
+}
+
+FutureWorker worker = new FutureWorker(2);
+
+SimpleJob job1 = new SimpleJob();
+SimpleJob job2 = new SimpleJob();
+SimpleJob job3 = new SimpleJob();
+
+Future future1 = worker.push(job1.run); // will call right way since the poll is free
+Future future2 = worker.push(job2.run); // same as before, still have space
+Future future3 = worker.push(job3.run); // will be queued and hold
+
+job1.started; // true
+job2.started; // true
+job3.started; // false
+
+job1.completer.complete(null);
+
+new Future.microtask(() {
+  job3.started; // true
+});
+
+future3.then((value) {
+  value; // done, after the job3 completes
+});
+
+job3.completer.complete('done');
+```
+
+You probably going to use it when you wanna limit calls for a server and stuff
+like that, so since adding a timeout is a common practice (to avoid the poll to
+never get free slots) you can send a duration to timeout when constructing the
+worker.
+
+```dart
+FutureWorker worker = new FutureWorker(2, timeout: new Duration(seconds: 15));
+```
