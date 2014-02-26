@@ -180,6 +180,10 @@ class SimpleJob {
   }
 }
 
+Future silentError(Future future) {
+  return future.catchError((_) => null);
+}
+
 Future plusTwo(v) => new Future.value(v + 2);
 
 Future throwError(v) => throw new Exception("an error ocurred");
