@@ -14,6 +14,9 @@ part of future_goodies;
 Future settle(List<Future> futures) => Future.wait(futures.map(SettleResult.settle));
 
 class SettleResult {
+  static final COMPLETED = #_completed;
+  static final REJECTED = #_rejected;
+
   final Symbol status;
   final dynamic result;
   final dynamic error;
@@ -28,20 +31,20 @@ class SettleResult {
    *
    * Given the original future has completed with success,
    * the [SettleResult] will have the [status] value of
-   * `#completed` and the [result] will have the completion value.
+   * [COMPLETED] and the [result] will have the completion value.
    *
    * Given the original future fails, the [SettleResult] will
-   * have the [status] as `#rejected` and the `error` will contain
+   * have the [status] as [REJECTED] and the `error` will contain
    * the thrown error.
    *
    *     SettleResult.settle(new Future.value('ok')).then((SettleResult res) {
-   *      res.status; // #completed
+   *      res.status; // SettleResult.COMPLETED
    *      res.result; // 'ok'
    *      res.error; // null
    *     });
    *
    *     SettleResult.settle(new Future.error('err')).then((SettleResult res) {
-   *       res.status; // #rejected
+   *       res.status; // SettleResult.REJECTED
    *       res.result; // null
    *       res.error; // 'err'
    *     });
@@ -50,8 +53,8 @@ class SettleResult {
     return input.then(_buildCompleted, onError: _buildError);
   }
 
-  static SettleResult _buildCompleted(dynamic value) => new SettleResult(#completed, result: value);
-  static SettleResult _buildError(dynamic error) => new SettleResult(#rejected, error: error);
+  static SettleResult _buildCompleted(dynamic value) => new SettleResult(COMPLETED, result: value);
+  static SettleResult _buildError(dynamic error) => new SettleResult(REJECTED, error: error);
 
   operator ==(SettleResult res) {
     return status == res.status
@@ -60,9 +63,9 @@ class SettleResult {
   }
 
   String toString() {
-    if (status == #completed) {
+    if (status == COMPLETED) {
       return "SettleResult status:#completed result:$result";
-    } else if (status == #rejected) {
+    } else if (status == REJECTED) {
       return "SettleResult status:#rejected error:$error";
     }
   }
