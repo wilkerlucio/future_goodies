@@ -166,6 +166,39 @@ void runTests() {
         });
       });
     });
+
+    group('settle', () {
+      test('returns on empty list for empty input', () {
+        expect(settle([]), completion([]));
+      });
+
+      test('maps a list of future into SettleResults', () {
+        return settle([new Future.value('ok'), new Future.error('err')]).then((List<SettleResult> statuses) {
+          expect(statuses[0], new SettleResult(#completed, result: 'ok'));
+          expect(statuses[1], new SettleResult(#rejected, error: 'err'));
+        });
+      });
+
+      group('SettleResult', () {
+        test('return completed result when the future completes', () {
+          expect(SettleResult.settle(new Future.value('ok')), completion(new SettleResult(#completed, result: 'ok')));
+        });
+
+        test('return rejected result when the future completes', () {
+          Exception error = new Exception('err');
+
+          expect(SettleResult.settle(new Future.error(error)), completion(new SettleResult(#rejected, error: error)));
+        });
+
+        test('toString for completed', () {
+          expect(new SettleResult(#completed, result: 'ok').toString(), 'SettleResult status:#completed result:ok');
+        });
+
+        test('toString for rejected', () {
+          expect(new SettleResult(#rejected, error: 'err').toString(), 'SettleResult status:#rejected error:err');
+        });
+      });
+    });
   });
 }
 
