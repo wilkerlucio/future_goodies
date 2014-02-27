@@ -1,13 +1,14 @@
 import 'package:unittest/unittest.dart';
 import 'package:future_goodies/future_goodies.dart';
 import 'dart:async';
+import 'dart:math';
 
 final Function IDENTITY = (x) => x;
 
 void runTests() {
   group("Future Goodies", () {
     group("sequence", () {
-      Future testValidSequence(List input, List output, {Function mapFunction}) {
+      void testValidSequence(List input, List output, {Function mapFunction}) {
         if (mapFunction == null)
           mapFunction = IDENTITY;
 
@@ -196,6 +197,147 @@ void runTests() {
 
         test('toString for rejected', () {
           expect(new SettleResult(SettleResult.REJECTED, error: 'err').toString(), 'SettleResult status:#rejected error:err');
+        });
+      });
+    });
+
+    group('unfold', () {
+      test('instant unfold', () {
+        List<int> calls = [];
+
+        Function unspool = (seed) {
+          return [seed, null];
+        };
+
+        Function condition = (value) {
+          return calls.length > 0;
+        };
+
+        Function process = (value) {
+          calls.add(value);
+        };
+
+        return unfold(unspool, condition, process, 0).then((_) {
+          expect(calls, [0]);
+        });
+      });
+
+      test('incremental checking', () {
+        int count = 0;
+
+        Function unspool = (seed) {
+          return [seed, seed + 1];
+        };
+
+        Function condition = (value) {
+          return count > 10;
+        };
+
+        Function process = (value) {
+          count += value;
+        };
+
+        return unfold(unspool, condition, process, 0).then((_) {
+          expect(count, 15);
+        });
+      });
+
+      test('seed as a future', () {
+        int count = 0;
+
+        Function unspool = (seed) {
+          return [seed, seed + 1];
+        };
+
+        Function condition = (value) {
+          return count > 10;
+        };
+
+        Function process = (value) {
+          count += value;
+        };
+
+        return unfold(unspool, condition, process, new Future.value(0)).then((_) {
+          expect(count, 15);
+        });
+      });
+
+      test('unspool returns value as future', () {
+        int count = 0;
+
+        Function unspool = (seed) {
+          return [new Future.value(seed), seed + 1];
+        };
+
+        Function condition = (value) {
+          return count > 10;
+        };
+
+        Function process = (value) {
+          count += value;
+        };
+
+        return unfold(unspool, condition, process, 0).then((_) {
+          expect(count, 15);
+        });
+      });
+
+      test('incremental unspool future return', () {
+        int count = 0;
+
+        Function unspool = (seed) {
+          return new Future.value([seed, seed + 1]);
+        };
+
+        Function condition = (value) {
+          return count > 10;
+        };
+
+        Function process = (value) {
+          count += value;
+        };
+
+        return unfold(unspool, condition, process, 0).then((_) {
+          expect(count, 15);
+        });
+      });
+
+      test('process can delay the run', () {
+        List<int> calls = [];
+
+        Function unspool = (seed) {
+          return [seed, seed + 1];
+        };
+
+        Function condition = (value) {
+          return calls.length == 5;
+        };
+
+        Function process = (value) {
+          Random random = new Random();
+          return new Future.delayed(new Duration(milliseconds: random.nextInt(10)), () {
+            calls.add(value);
+          });
+        };
+
+        return unfold(unspool, condition, process, 0).then((_) {
+          expect(calls, [0, 1, 2, 3, 4]);
+        });
+      });
+    });
+
+    group('unfoldList', () {
+      test('process results by concatenating results', () {
+        Function unspool = (seed) {
+          return [new Future.value(seed), seed + 1];
+        };
+
+        Function condition = (value) {
+          return value == 5;
+        };
+
+        return unfoldList(unspool, condition, 0).then((List results) {
+          expect(results, [0, 1, 2, 3, 4]);
         });
       });
     });
