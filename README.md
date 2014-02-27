@@ -234,9 +234,6 @@ unfold(unspool, condition, log, start).then((_) {
 });
 ```
 
-This method idea and a lot of documentation text was were extracted from the great
-When library: https://github.com/cujojs/when/blob/master/docs/api.md#unbounded-lists
-
 ### unfoldList
 
 Unfold resolving into a list
@@ -262,3 +259,6 @@ unfoldList(unspool, stopCondition, 0).then((List<int> values) {
   print(values); // [0, 1, 2]
 });
 ```
+
+The methods [unfold] and [unfoldList] ideas and a lot of documentation text was were extracted from the great
+When library: https://github.com/cujojs/when/blob/master/docs/api.md#unbounded-lists
