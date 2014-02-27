@@ -67,6 +67,8 @@ class SettleResult {
       return "SettleResult status:#completed result:$result";
     } else if (status == REJECTED) {
       return "SettleResult status:#rejected error:$error";
+    } else {
+      return 'Invalid status:$status';
     }
   }
 }
