@@ -59,7 +59,7 @@ typedef dynamic UnfoldProcess(value);
  *       // as the new seed
  *       var next = [random.nextInt(100), new DateTime.now()];
  *
- *       // Introduce a delay, just for fun, to show that we can return a promise
+ *       // Introduce a delay, just for fun, to show that we can return a future
  *       return new Future.delayed(new Duration(milliseconds: random.nextInt(1000)), () => next);
  *     };
  *
