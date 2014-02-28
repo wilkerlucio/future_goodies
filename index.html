@@ -58,6 +58,37 @@
 <p>Future goodies provides some helper functions to deal with Future management. Here we going to document each function.</p>
 
 <h3>
+<a name="allcompleted" class="anchor" href="#allcompleted"><span class="octicon octicon-link"></span></a>allCompleted</h3>
+
+<p>Given a list of futures, return all that completed successfully
+after all of then responded</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">allCompleted</span><span class="p">([</span>
+ <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="m">1</span><span class="p">),</span>
+ <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'err'</span><span class="p">),</span>
+ <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="m">2</span><span class="p">)]).</span><span class="n">then</span><span class="p">((</span><span class="n">List</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">print</span><span class="p">(</span><span class="n">results</span><span class="p">);</span> <span class="c1">// [1, 2]</span>
+ <span class="p">});</span>
+</pre></div>
+
+<p>This function is the inverse of [allRejected].</p>
+
+<h3>
+<a name="allrejected" class="anchor" href="#allrejected"><span class="octicon octicon-link"></span></a>allRejected</h3>
+
+<p>Given a list of futures, return all that got error</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">allRejected</span><span class="p">([</span>
+ <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="m">1</span><span class="p">),</span>
+ <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'err'</span><span class="p">),</span>
+ <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="m">2</span><span class="p">)]).</span><span class="n">then</span><span class="p">((</span><span class="n">List</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">print</span><span class="p">(</span><span class="n">results</span><span class="p">);</span> <span class="c1">// ['err']</span>
+ <span class="p">});</span>
+</pre></div>
+
+<p>This function is the inverse of [allCompleted].</p>
+
+<h3>
 <a name="sequence" class="anchor" href="#sequence"><span class="octicon octicon-link"></span></a>sequence</h3>
 
 <p>This function iteraters over a collection by calling the <code>iterator</code>, this <code>iterator</code> can either return a value, or a <code>Future</code>, if a <code>Future</code> is returned, the iteration will wait until it completes before running the next iteration. This function returns a <code>Future</code>, that will resolve as a <code>List</code> containing the result values (all resolved) of the iteration. If any iteration fails (sync or async) the <code>sequence</code> will stop and the <code>Future</code> returned by it will fail with the error.</p>
