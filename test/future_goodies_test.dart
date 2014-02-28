@@ -341,6 +341,18 @@ void runTests() {
         });
       });
     });
+
+    group('allCompleted', () {
+      test('filter completed futures and return then', () {
+        expect(allCompleted([new Future.value(1), new Future.error('err'), new Future.value(2)]), completion([1, 2]));
+      });
+    });
+
+    group('allRejected', () {
+      test('filter rejected futures and return then', () {
+        expect(allRejected([new Future.value(1), new Future.error('err'), new Future.value(2)]), completion(['err']));
+      });
+    });
   });
 }
 
