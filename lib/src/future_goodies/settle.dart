@@ -11,7 +11,7 @@ part of future_goodies;
  *
  * If you wanna do it for a single future, check [SettleResult.settle]
  */
-Future settle(List<Future> futures) => Future.wait(futures.map(SettleResult.settle));
+Future<List<SettleResult>> settle(List<Future> futures) => Future.wait(futures.map(SettleResult.settle));
 
 class SettleResult {
   static final COMPLETED = #_completed;
@@ -22,6 +22,9 @@ class SettleResult {
   final dynamic error;
 
   SettleResult(this.status, {this.result, this.error});
+
+  bool get isCompleted => status == COMPLETED;
+  bool get isRejected => status == REJECTED;
 
   /**
    * Wraps a future to always completes with a SettleResult
