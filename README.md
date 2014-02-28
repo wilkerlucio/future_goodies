@@ -20,6 +20,37 @@ Usage
 
 Future goodies provides some helper functions to deal with Future management. Here we going to document each function.
 
+### allCompleted
+
+Given a list of futures, return all that completed successfully
+after all of then responded
+
+```dart
+allCompleted([
+ new Future.value(1),
+ new Future.error('err'),
+ new Future.value(2)]).then((List results) {
+   print(results); // [1, 2]
+ });
+```
+
+This function is the inverse of [allRejected].
+
+### allRejected
+
+Given a list of futures, return all that got error
+
+```dart
+allRejected([
+ new Future.value(1),
+ new Future.error('err'),
+ new Future.value(2)]).then((List results) {
+   print(results); // ['err']
+ });
+```
+
+This function is the inverse of [allCompleted].
+
 ### sequence
 
 This function iteraters over a collection by calling the `iterator`, this `iterator` can either return a value, or a `Future`, if a `Future` is returned, the iteration will wait until it completes before running the next iteration. This function returns a `Future`, that will resolve as a `List` containing the result values (all resolved) of the iteration. If any iteration fails (sync or async) the `sequence` will stop and the `Future` returned by it will fail with the error.
