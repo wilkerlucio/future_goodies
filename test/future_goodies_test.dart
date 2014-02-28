@@ -27,6 +27,10 @@ void runTests() {
         expect(sequence([1], throwError), throws);
       });
 
+      test('iterator can return values instead of Futures', () {
+        testValidSequence([1, 2], [3, 4], mapFunction: (n) => n + 2);
+      });
+
       test("runs the tasks in sequence", () {
         List calls = [];
         Completer lastCompleter;
@@ -61,6 +65,10 @@ void runTests() {
 
       test("accumulates the inputs", () {
         expect(pipeline(0, [1, 2], (acc, value) => acc + value), completion(equals(3)));
+      });
+
+      test("accumulates the inputs with Futures", () {
+        expect(pipeline(0, [1, 2], (acc, value) => randomDelay(acc + value)), completion(equals(3)));
       });
     });
 
@@ -371,8 +379,12 @@ Future silentError(Future future) {
   return future.catchError((_) => null);
 }
 
-Future plusTwo(v) => new Future.value(v + 2);
+Future plusTwo(v) => randomDelay(v + 2);
 
 Future throwError(v) => throw new Exception("an error ocurred");
+
+var rand = new Random();
+
+Future randomDelay(value) => new Future.delayed(new Duration(milliseconds: rand.nextInt(200)), () => value);
 
 void main() => runTests();

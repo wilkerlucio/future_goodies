@@ -1,7 +1,5 @@
 part of future_goodies;
 
-typedef Future FutureFunction(dynamic item);
-
 /**
  * Iterate through a list waiting for the [Future] to complete before moving next
  *
@@ -20,8 +18,8 @@ typedef Future FutureFunction(dynamic item);
  *       print(values); // [2, 4, 6]
  *     });
  */
-Future<List> sequence(Iterable iterable, FutureFunction iterator) {
+Future<List> sequence(Iterable iterable, iterator(value)) {
   return pipeline([], iterable, (list, value) {
-    return iterator(value).then((result) => list..add(result));
+    return new Future.value(iterator(value)).then((result) => list..add(result));
   });
 }

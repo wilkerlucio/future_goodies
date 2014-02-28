@@ -1,7 +1,5 @@
 part of future_goodies;
 
-typedef Future FutureReduceFunction(dynamic accumulator, dynamic value);
-
 /**
  * Reduces a collection to a single value by iteratively combining each
  * element of the collection with an existing value using the provided
@@ -16,7 +14,7 @@ typedef Future FutureReduceFunction(dynamic accumulator, dynamic value);
  *       print(result); // 'abc'
  *     });
  */
-Future pipeline(dynamic initial, Iterable list, FutureReduceFunction iterator) {
+Future pipeline(dynamic initial, Iterable list, iterator(accumulator, value)) {
   if (list.isEmpty)
     return new Future.value(initial);
 
