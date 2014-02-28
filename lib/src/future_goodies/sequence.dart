@@ -1,5 +1,7 @@
 part of future_goodies;
 
+typedef Future FutureFunction(dynamic item);
+
 /**
  * Iterate through a list waiting for the [Future] to complete before moving next
  *

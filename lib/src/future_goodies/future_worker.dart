@@ -1,5 +1,7 @@
 part of future_goodies;
 
+typedef Future Worker();
+
 /**
  * Managers a [Future] worker poll
  *

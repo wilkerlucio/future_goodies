@@ -1,5 +1,7 @@
 part of future_goodies;
 
+typedef Future FutureReduceFunction(dynamic accumulator, dynamic value);
+
 /**
  * Reduces a collection to a single value by iteratively combining each
  * element of the collection with an existing value using the provided
