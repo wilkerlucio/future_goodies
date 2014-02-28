@@ -221,7 +221,7 @@ a pair of [value, newSeed] (or a [Future] pair, see above). The value will be
 passed to [handler], which can do any necessary on or with value, and may return
 a future. The newSeed will be passed as the [seed] to the next iteration of [unspool].
 
-## Examples
+#### Examples
 
 This example generates random numbers at random intervals for 10 seconds.
 
