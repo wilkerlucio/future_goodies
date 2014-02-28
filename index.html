@@ -1,0 +1,327 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>Future goodies</title>
+  <meta name="description" content="Future goodies for Dart">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Future goodies</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">Future goodies for Dart</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/wilkerlucio/future_goodies/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/wilkerlucio/future_goodies/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/wilkerlucio/future_goodies" class="code">View Future goodies on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h1>
+<a name="dart-future-goodies" class="anchor" href="#dart-future-goodies"><span class="octicon octicon-link"></span></a>Dart Future Goodies</h1>
+
+<p><a href="https://drone.io/github.com/wilkerlucio/future_goodies/latest"><img src="https://drone.io/github.com/wilkerlucio/future_goodies/status.png" alt="Build Status"></a></p>
+
+<p>Future goodies for Dart.</p>
+
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Just add to your <code>pubspec.yaml</code>:</p>
+
+<div class="highlight highlight-yaml"><pre><span class="l-Scalar-Plain">dependencies</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">future_goodies</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">any</span>
+</pre></div>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Future goodies provides some helper functions to deal with Future management. Here we going to document each function.</p>
+
+<h3>
+<a name="sequence" class="anchor" href="#sequence"><span class="octicon octicon-link"></span></a>sequence</h3>
+
+<p>This function iteraters over a collection by calling the <code>iterator</code>, this <code>iterator</code> can either return a value, or a <code>Future</code>, if a <code>Future</code> is returned, the iteration will wait until it completes before running the next iteration. This function returns a <code>Future</code>, that will resolve as a <code>List</code> containing the result values (all resolved) of the iteration. If any iteration fails (sync or async) the <code>sequence</code> will stop and the <code>Future</code> returned by it will fail with the error.</p>
+
+<div class="highlight highlight-dart"><pre><span class="k">import</span> <span class="s1">'package:future_goodies/future_goodies.dart'</span><span class="p">;</span>
+<span class="k">import</span> <span class="s1">'dart:async'</span><span class="p">;</span>
+
+<span class="n">Future</span> <span class="n">delayed</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">delayed</span><span class="p">(</span><span class="k">new</span> <span class="n">Duration</span><span class="p">(</span><span class="nl">milliseconds:</span> <span class="m">20</span><span class="p">),</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="n">value</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">Future</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">([</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">],</span> <span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">delayed</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="m">2</span><span class="p">));</span>
+
+  <span class="n">result</span><span class="p">.</span><span class="n">then</span><span class="p">((</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">print</span><span class="p">(</span><span class="n">values</span><span class="p">);</span> <span class="c1">// [2, 4, 6, 8]</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="pipeline" class="anchor" href="#pipeline"><span class="octicon octicon-link"></span></a>pipeline</h3>
+
+<p>Reduces a collection to a single value by iteratively combining each
+element of the collection with an existing value using the provided
+function. The iterator must return a Future, and the iterator
+will wait for it before moving on.</p>
+
+<p>If any iteration fails the result Future will fail with same error.</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">Future</span> <span class="n">simpleDelay</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">delayed</span><span class="p">(</span><span class="k">new</span> <span class="n">Duration</span><span class="p">(</span><span class="nl">milliseconds:</span> <span class="m">10</span><span class="p">));</span>
+
+<span class="n">pipeline</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="p">[</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">],</span> <span class="p">(</span><span class="kt">String</span> <span class="n">acc</span><span class="p">,</span> <span class="kt">String</span> <span class="n">v</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">simpleDelay</span><span class="p">(</span><span class="n">acc</span> <span class="o">+</span> <span class="n">v</span><span class="p">)).</span><span class="n">then</span><span class="p">((</span><span class="kt">String</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">);</span> <span class="c1">// 'abc'</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="futureworker" class="anchor" href="#futureworker"><span class="octicon octicon-link"></span></a>FutureWorker</h3>
+
+<p>Managers a Future worker poll</p>
+
+<p>The purpouse of this class is to help when you need to impose some limit
+for Future calls. You just need to initialize with the limit number of
+workers, then you call push passing a function that returns a Future
+and with that the worker will manage to call this function when the poll
+has space:</p>
+
+<div class="highlight highlight-dart"><pre><span class="kd">class</span> <span class="nc">SimpleJob</span> <span class="p">{</span>
+  <span class="kt">bool</span> <span class="n">started</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="n">Completer</span> <span class="n">completer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Completer</span><span class="p">();</span>
+
+  <span class="n">Future</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">started</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">completer</span><span class="p">.</span><span class="n">future</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">FutureWorker</span> <span class="n">worker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FutureWorker</span><span class="p">(</span><span class="m">2</span><span class="p">);</span>
+
+<span class="n">SimpleJob</span> <span class="n">job1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SimpleJob</span><span class="p">();</span>
+<span class="n">SimpleJob</span> <span class="n">job2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SimpleJob</span><span class="p">();</span>
+<span class="n">SimpleJob</span> <span class="n">job3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SimpleJob</span><span class="p">();</span>
+
+<span class="n">Future</span> <span class="n">future1</span> <span class="o">=</span> <span class="n">worker</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">job1</span><span class="p">.</span><span class="n">run</span><span class="p">);</span> <span class="c1">// will call right way since the poll is free</span>
+<span class="n">Future</span> <span class="n">future2</span> <span class="o">=</span> <span class="n">worker</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">job2</span><span class="p">.</span><span class="n">run</span><span class="p">);</span> <span class="c1">// same as before, still have space</span>
+<span class="n">Future</span> <span class="n">future3</span> <span class="o">=</span> <span class="n">worker</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">job3</span><span class="p">.</span><span class="n">run</span><span class="p">);</span> <span class="c1">// will be queued and hold</span>
+
+<span class="n">job1</span><span class="p">.</span><span class="n">started</span><span class="p">;</span> <span class="c1">// true</span>
+<span class="n">job2</span><span class="p">.</span><span class="n">started</span><span class="p">;</span> <span class="c1">// true</span>
+<span class="n">job3</span><span class="p">.</span><span class="n">started</span><span class="p">;</span> <span class="c1">// false</span>
+
+<span class="n">job1</span><span class="p">.</span><span class="n">completer</span><span class="p">.</span><span class="n">complete</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+
+<span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">microtask</span><span class="p">(()</span> <span class="p">{</span>
+  <span class="n">job3</span><span class="p">.</span><span class="n">started</span><span class="p">;</span> <span class="c1">// true</span>
+<span class="p">});</span>
+
+<span class="n">future3</span><span class="p">.</span><span class="n">then</span><span class="p">((</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">value</span><span class="p">;</span> <span class="c1">// done, after the job3 completes</span>
+<span class="p">});</span>
+
+<span class="n">job3</span><span class="p">.</span><span class="n">completer</span><span class="p">.</span><span class="n">complete</span><span class="p">(</span><span class="s1">'done'</span><span class="p">);</span>
+</pre></div>
+
+<p>You probably going to use it when you wanna limit calls for a server and stuff
+like that, so since adding a timeout is a common practice (to avoid the poll to
+never get free slots) you can send a duration to timeout when constructing the
+worker.</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">FutureWorker</span> <span class="n">worker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FutureWorker</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="nl">timeout:</span> <span class="k">new</span> <span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span> <span class="m">15</span><span class="p">));</span>
+</pre></div>
+
+<h3>
+<a name="settle" class="anchor" href="#settle"><span class="octicon octicon-link"></span></a>settle</h3>
+
+<p>Makes a list of futures always completes, returning the state of
+the completion.</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">settle</span><span class="p">([</span><span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">),</span> <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'err'</span><span class="p">)]).</span><span class="n">then</span><span class="p">((</span><span class="n">List</span><span class="o">&lt;</span><span class="n">SettleResult</span><span class="o">&gt;</span> <span class="n">results</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">results</span><span class="p">[</span><span class="m">0</span><span class="p">];</span> <span class="c1">// &lt;SettleResult status:#completed result:hello&gt;</span>
+  <span class="n">results</span><span class="p">[</span><span class="m">1</span><span class="p">];</span> <span class="c1">// &lt;SettleResult status:#rejected error:err&gt;</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>If you wanna do it for a single future, check [SettleResult.settle]</p>
+
+<h3>
+<a name="settleresultsettle" class="anchor" href="#settleresultsettle"><span class="octicon octicon-link"></span></a>SettleResult.settle</h3>
+
+<p>Wraps a future to always completes with a SettleResult</p>
+
+<p>This function will return a [Future], this future will
+be an instance of [SettleResult].</p>
+
+<p>Given the original future has completed with success,
+the [SettleResult] will have the [status] value of
+[COMPLETED] and the [result] will have the completion value.</p>
+
+<p>Given the original future fails, the [SettleResult] will
+have the [status] as [REJECTED] and the <code>error</code> will contain
+the thrown error.</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">SettleResult</span><span class="p">.</span><span class="n">settle</span><span class="p">(</span><span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">)).</span><span class="n">then</span><span class="p">((</span><span class="n">SettleResult</span> <span class="n">res</span><span class="p">)</span> <span class="p">{</span>
+ <span class="n">res</span><span class="p">.</span><span class="n">status</span><span class="p">;</span> <span class="c1">// SettleResult.COMPLETED</span>
+ <span class="n">res</span><span class="p">.</span><span class="n">result</span><span class="p">;</span> <span class="c1">// 'ok'</span>
+ <span class="n">res</span><span class="p">.</span><span class="n">error</span><span class="p">;</span> <span class="c1">// null</span>
+<span class="p">});</span>
+
+<span class="n">SettleResult</span><span class="p">.</span><span class="n">settle</span><span class="p">(</span><span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">error</span><span class="p">(</span><span class="s1">'err'</span><span class="p">)).</span><span class="n">then</span><span class="p">((</span><span class="n">SettleResult</span> <span class="n">res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">res</span><span class="p">.</span><span class="n">status</span><span class="p">;</span> <span class="c1">// SettleResult.REJECTED</span>
+  <span class="n">res</span><span class="p">.</span><span class="n">result</span><span class="p">;</span> <span class="c1">// null</span>
+  <span class="n">res</span><span class="p">.</span><span class="n">error</span><span class="p">;</span> <span class="c1">// 'err'</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="unfold" class="anchor" href="#unfold"><span class="octicon octicon-link"></span></a>unfold</h3>
+
+<p>The methods [sequence] and [pipeline] are great ways to process asynchronous
+arrays of futures and tasks. Sometimes, however, you may not know the array
+in advance, or may not need or want to process all the items in the array.</p>
+
+<p>For example, here are a few situations where you may not know the bounds:</p>
+
+<ol>
+<li>You need to process a queue to which items are still being added as you process it</li>
+<li>You need to execute a task repeatedly until a particular condition becomes true</li>
+<li>You need to selectively process items in an array, rather than all items</li>
+</ol><p>In these cases, you can use when/unfold to iteratively (and asynchronously)
+process items until a particular condition, which you supply, is true.</p>
+
+<pre><code>Future future = unfold(unspool, stopCondition, handler, seed);
+</code></pre>
+
+<p>Where:</p>
+
+<ul>
+<li>[unspool] - function that, given a seed, returns a [valueToSendToHandler, newSeed]
+pair. May return a list, list of futures, future for an list, or future for an list of futures.</li>
+<li>[stopCondition] - function that should return truthy when the unfold should stop</li>
+<li>[handler] - function that receives the valueToSendToHandler of the current
+iteration. This function can process valueToSendToHandler in whatever way you need.
+It may return a [Future] to delay the next iteration of the [unfold].</li>
+</ul><p>Send values produced by [unspool] iteratively to [handler] until a condition is
+true. The [unspool] function acts like a generator, taking a [seed] and producing
+a pair of <a href="or%20a%20%5BFuture%5D%20pair,%20see%20above">value, newSeed</a>. The value will be
+passed to [handler], which can do any necessary on or with value, and may return
+a future. The newSeed will be passed as the [seed] to the next iteration of [unspool].</p>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<p>This example generates random numbers at random intervals for 10 seconds.</p>
+
+<p>The condition could easily be modified (to return false;) to generate random numbers
+forever. Interestingly, this would not overflow the call stack, and would not starve
+application code since it is asynchronous.</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">Random</span> <span class="n">random</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="p">();</span>
+
+<span class="c1">// set end time for 10 seconds from now</span>
+<span class="n">DateTime</span> <span class="n">end</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">add</span><span class="p">(</span><span class="k">new</span> <span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span> <span class="m">10</span><span class="p">));</span>
+
+<span class="c1">// Generate random numbers at random intervals!</span>
+<span class="c1">// Note that we could generate these forever, and never</span>
+<span class="c1">// blow the call stack, nor would we starve the application</span>
+<span class="n">Function</span> <span class="n">unspool</span> <span class="o">=</span> <span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// seed is passed in, although for this example, we don't need it</span>
+
+  <span class="c1">// Return a random number as the value, and the time it was generated</span>
+  <span class="c1">// as the new seed</span>
+  <span class="kd">var</span> <span class="n">next</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="p">.</span><span class="n">nextInt</span><span class="p">(</span><span class="m">100</span><span class="p">),</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">()];</span>
+
+  <span class="c1">// Introduce a delay, just for fun, to show that we can return a future</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="n">Future</span><span class="p">.</span><span class="n">delayed</span><span class="p">(</span><span class="k">new</span> <span class="n">Duration</span><span class="p">(</span><span class="nl">milliseconds:</span> <span class="n">random</span><span class="p">.</span><span class="n">nextInt</span><span class="p">(</span><span class="m">1000</span><span class="p">)),</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="n">next</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="c1">// Stop after 10 seconds</span>
+<span class="n">Function</span> <span class="n">condition</span> <span class="o">=</span> <span class="p">(</span><span class="n">DateTime</span> <span class="n">time</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">time</span><span class="p">.</span><span class="n">isAfter</span><span class="p">(</span><span class="n">end</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="n">Function</span> <span class="n">log</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">print</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="n">DateTime</span> <span class="n">start</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">();</span>
+
+<span class="n">unfold</span><span class="p">(</span><span class="n">unspool</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">start</span><span class="p">).</span><span class="n">then</span><span class="p">((</span><span class="n">_</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">print</span><span class="p">(</span><span class="s1">'Ran for '</span> <span class="o">+</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">difference</span><span class="p">(</span><span class="n">start</span><span class="p">).</span><span class="n">inMicroseconds</span><span class="p">.</span><span class="n">toString</span><span class="p">()</span> <span class="o">+</span> <span class="s1">'ms'</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="unfoldlist" class="anchor" href="#unfoldlist"><span class="octicon octicon-link"></span></a>unfoldList</h3>
+
+<p>Unfold resolving into a list</p>
+
+<pre><code>unfoldList(unspool, stopCondition, seed);
+</code></pre>
+
+<p>Where:</p>
+
+<ul>
+<li>[unspool] - function that, given a seed, returns a [valueToAddToList, newSeed] pair.
+May return an array, array of futures, futures for an array, or future for an array of futures.</li>
+<li>[stopCondition] - function that should return truthy when the unfold should stop</li>
+<li>[seed] - intial value provided to the first [unspool] invocation. May be a [Future].</li>
+</ul><p>Generate a list of items from a [seed] by executing the [unspool] function while [stopCondition]
+returns true. The result [Future] will fulfill with a [List] containing all each valueToAddToList
+that is generated by [unspool].</p>
+
+<div class="highlight highlight-dart"><pre><span class="n">Function</span> <span class="n">stopCondition</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">i</span> <span class="o">==</span> <span class="m">3</span><span class="p">;</span>
+<span class="n">Function</span> <span class="n">unspool</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="m">1</span><span class="p">];</span>
+
+<span class="n">unfoldList</span><span class="p">(</span><span class="n">unspool</span><span class="p">,</span> <span class="n">stopCondition</span><span class="p">,</span> <span class="m">0</span><span class="p">).</span><span class="n">then</span><span class="p">((</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">values</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">print</span><span class="p">(</span><span class="n">values</span><span class="p">);</span> <span class="c1">// [0, 1, 2]</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>The methods [unfold] and [unfoldList] ideas and a lot of documentation text was were extracted from the great
+When library: <a href="https://github.com/cujojs/when/blob/master/docs/api.md#unbounded-lists">https://github.com/cujojs/when/blob/master/docs/api.md#unbounded-lists</a></p>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/wilkerlucio" class="avatar"><img src="https://avatars.githubusercontent.com/u/25736" width="48" height="48"/></a> <a href="https://github.com/wilkerlucio">wilkerlucio</a> maintains <a href="https://github.com/wilkerlucio/future_goodies">Future goodies</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/wilkerlucio/future_goodies/tarball/master" class="tar">tar</a><a href="https://github.com/wilkerlucio/future_goodies/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
